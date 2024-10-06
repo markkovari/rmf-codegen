@@ -1,6 +1,6 @@
 package io.vrap.rmf.codegen.di
 
-import io.vrap.rmf.codegen.common.generator.core.ResourceCollection
+import io.vrap.rmf.codegen.core.ResourceCollection
 import io.vrap.rmf.codegen.io.DataSink
 import io.vrap.rmf.codegen.io.FileDataSink
 import io.vrap.rmf.codegen.types.*
