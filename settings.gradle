@@ -13,6 +13,7 @@ include 'languages:python'
 include 'languages:go'
 include 'languages:ramldoc'
 include 'languages:bruno'
+include 'languages:rust'
 
 include 'ctp-validators'
 include 'tools:cli-application'
