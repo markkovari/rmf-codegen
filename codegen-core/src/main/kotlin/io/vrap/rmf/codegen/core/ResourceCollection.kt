@@ -1,4 +1,4 @@
-package io.vrap.rmf.codegen.common.generator.core
+package io.vrap.rmf.codegen.core
 
 import io.vrap.rmf.codegen.types.VrapType
 import io.vrap.rmf.raml.model.resources.Resource
