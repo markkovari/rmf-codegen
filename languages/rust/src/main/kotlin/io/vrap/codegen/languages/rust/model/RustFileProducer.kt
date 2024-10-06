@@ -1,28 +1,23 @@
 package io.vrap.codegen.languages.rust.model
 
-import io.vrap.codegen.languages.extensions.getSuperTypes
-import io.vrap.codegen.languages.extensions.isPatternProperty
-import io.vrap.codegen.languages.extensions.sortedByTopology
+import io.vrap.codegen.languages.rust.RustObjectTypeExtensions
 import io.vrap.rmf.codegen.di.AllAnyTypes
 import io.vrap.rmf.codegen.di.BasePackageName
+
 import io.vrap.rmf.codegen.io.TemplateFile
 import io.vrap.rmf.codegen.rendering.FileProducer
-import io.vrap.rmf.codegen.rendering.utils.escapeAll
-import io.vrap.rmf.codegen.rendering.utils.keepIndentation
-import io.vrap.rmf.codegen.types.VrapEnumType
-import io.vrap.rmf.codegen.types.VrapScalarType
+
 import io.vrap.rmf.codegen.types.VrapTypeProvider
+import io.vrap.rmf.raml.model.types.AnyType
 
 class RustFileProducer constructor(
-//    override val vrapTypeProvider: VrapTypeProvider,
-//    @AllAnyTypes val allAnyTypes: List<AnyType>,
-//    @BasePackageName val basePackageName: String
-)
-//    :
-//    RustObjectTypeExtensions, FileProducer
-{
+    override val vrapTypeProvider: VrapTypeProvider,
+    @AllAnyTypes val allAnyTypes: List<AnyType>,
+    @BasePackageName val basePackageName: String
+) :
+    RustObjectTypeExtensions, FileProducer {
 
-//    override fun produceFiles(): List<TemplateFile> {
+    //    override fun produceFiles(): List<TemplateFile> {
 //        return allAnyTypes.filter { it is ObjectType || (it is StringType && it.pattern == null) }.groupBy {
 //            it.moduleName()
 //        }.map { entry: Map.Entry<String, List<AnyType>> ->
@@ -497,4 +492,7 @@ class RustFileProducer constructor(
 //
 //    private fun StringType.enumValues() =
 //        enum?.filter { it is StringInstance }?.map { (it as StringInstance).value }?.filterNotNull() ?: listOf()
+    override fun produceFiles(): List<TemplateFile> {
+        TODO("Not yet implemented")
+    }
 }

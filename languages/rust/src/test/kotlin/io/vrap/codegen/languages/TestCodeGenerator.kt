@@ -1,3 +1,5 @@
+package io.vrap.codegen.languages
+
 import io.vrap.codegen.languages.rust.RustBaseTypes
 import io.vrap.codegen.languages.rust.client.RustClientModule
 import io.vrap.codegen.languages.rust.model.RustModelModule
