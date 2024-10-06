@@ -8,6 +8,6 @@ import io.vrap.rmf.codegen.io.TemplateFile
  */
 interface FileProducer {
 
-    fun produceFiles():List<TemplateFile>
+    fun produceFiles(): List<TemplateFile>
 
 }

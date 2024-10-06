@@ -1,9 +1,8 @@
 package io.vrap.rmf.codegen.io
 
 import org.slf4j.LoggerFactory
-import java.util.logging.Logger
 
-object ConsoleDataSink : DataSink{
+object ConsoleDataSink : DataSink {
 
     private val LOGGER = LoggerFactory.getLogger(ConsoleDataSink::class.java)
 

@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory
 import java.nio.file.Path
 
 
-class OasProvider constructor(private val oasFileLocation: Path): ApiProvider {
+class OasProvider constructor(private val oasFileLocation: Path) : ApiProvider {
 
-    private val logger : Logger = LoggerFactory.getLogger(RamlApiProvider::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(RamlApiProvider::class.java)
 
     override val gitHash: String = ""
 

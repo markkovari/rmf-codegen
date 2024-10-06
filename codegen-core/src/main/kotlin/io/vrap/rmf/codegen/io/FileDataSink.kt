@@ -9,7 +9,7 @@ import java.io.InputStream
 import java.lang.Exception
 import kotlin.io.path.exists
 
-class FileDataSink constructor(val outputFolder:Path, private val dryRun: Boolean = false): DataSink {
+class FileDataSink constructor(val outputFolder: Path, private val dryRun: Boolean = false) : DataSink {
 
     private val generatedFiles = mutableListOf<File>()
 
@@ -52,9 +52,7 @@ class FileDataSink constructor(val outputFolder:Path, private val dryRun: Boolea
             return;
         }
         val files = FileUtils.listFiles(
-                outputFolder.toFile(),
-                TrueFileFilter.INSTANCE,
-                TrueFileFilter.INSTANCE
+            outputFolder.toFile(), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE
         ).filterNot { generatedFiles.contains(it) }
 
         files.map { it.delete() }

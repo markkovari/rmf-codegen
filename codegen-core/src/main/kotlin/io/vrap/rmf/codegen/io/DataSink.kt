@@ -4,7 +4,7 @@ interface DataSink {
 
     fun write(templateFile: TemplateFile)
 
-    fun clean():Boolean = true
+    fun clean(): Boolean = true
 
     fun postClean()
 

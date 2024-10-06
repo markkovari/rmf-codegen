@@ -15,9 +15,9 @@ import org.eclipse.emf.ecore.util.ComposedSwitch
 
 
 class PackageProvider constructor(
-        @BasePackageName val basePackage: String,
-        @ModelPackageName val localModelPackage: String,
-        @ClientPackageName val clientPackage: String
+    @BasePackageName val basePackage: String,
+    @ModelPackageName val localModelPackage: String,
+    @ClientPackageName val clientPackage: String
 ) : ComposedSwitch<String>() {
 
     init {
@@ -38,20 +38,19 @@ class PackageProvider constructor(
 
                 val annotation = currentType.getAnnotation("package")
                 if (annotation != null) {
-                    return annotation.let { it.value }
-                            ?.let { it.value }
-                            ?.let { "$localModelPackage/$it" }
-                            ?: localModelPackage
+                    return annotation.value?.value
+                        ?.let { "$localModelPackage/$it" }
+                        ?: localModelPackage
                 }
                 if (currentType.eContainer() is Library && (currentType.eContainer() as Library).getAnnotation("package") != null) {
 
                     var eContainer: EObject? = currentType.eContainer()
                     while (eContainer != null) {
                         if (eContainer is AnnotationsFacet) {
-                            return eContainer.let { it.getAnnotation("package") }
-                                    ?.let { it.value?.value }
-                                    ?.let { "$localModelPackage/$it" }
-                                    ?: localModelPackage
+                            return eContainer.getAnnotation("package")
+                                ?.let { it.value?.value }
+                                ?.let { "$localModelPackage/$it" }
+                                ?: localModelPackage
                         }
                         eContainer = eContainer.eContainer()
 

@@ -12,12 +12,17 @@ class ResourcesTypeProvider constructor(val packageProvider: PackageProvider) : 
     private val classNameMapper = CaseFormat.LOWER_HYPHEN.converterTo(CaseFormat.UPPER_CAMEL)
 
     override fun caseResource(resource: Resource): VrapType {
-        return VrapObjectType(packageProvider.doSwitch(resource), "${classNameMapper.convert(resource.resourcePathName)}Requests")
+        return VrapObjectType(
+            packageProvider.doSwitch(resource), "${classNameMapper.convert(resource.resourcePathName)}Requests"
+        )
     }
 
     override fun caseMethod(method: Method): VrapType {
         val resource = method.eContainer() as Resource
-        return VrapObjectType(packageProvider.doSwitch(method), "${classNameMapper.convert(resource.resourcePathName)}${method.methodName.firstUpperCase()}")
+        return VrapObjectType(
+            packageProvider.doSwitch(method),
+            "${classNameMapper.convert(resource.resourcePathName)}${method.methodName.firstUpperCase()}"
+        )
     }
 
     override fun caseTrait(trait: Trait): VrapType {
