@@ -9,11 +9,11 @@ private val HTML_RENDERER = HtmlRenderer.builder().build()
 private val PARSER = Parser.builder().build()
 
 fun DescriptionFacet.toHtml() = this
-        .description
-        ?.value
-        ?.let(PARSER::parse)
-        ?.let(HTML_RENDERER::render)
-        ?.trim()
+    .description
+    ?.value
+    ?.let(PARSER::parse)
+    ?.let(HTML_RENDERER::render)
+    ?.trim()
 
 
 

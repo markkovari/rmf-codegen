@@ -3,44 +3,44 @@ package io.vrap.rmf.codegen.rendering.utils
 
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.math.min
 
 /**
  * This method allows you to validate a string that for each open indStartToken char there is a corresponding indStopToken, if its not the case
- * this method throws an exception showing the line number of the non closed token
+ * this method throws an exception showing the line number of the non-closed token
  */
 fun validateString(input: String, indStartToken: String, indStopToken: String, escapeChar: Char) {
     val stack = Stack<Pair<Int, Int>>()
 
-    input.lines()
-            .forEachIndexed { index, s ->
-                var i = 0
-                while (i < s.length) {
-                    when (s[i]) {
-                        escapeChar -> i++
-                        indStartToken[0] ->
-                            when (s.substring(i, Math.min(s.length, i + indStartToken.length))) {
-                                indStartToken -> stack.push(Pair(index, i))
-                            }
-                        indStopToken[0] -> {
-                            when (s.substring(i, Math.min(s.length, i + indStopToken.length))) {
-                                indStopToken ->
-                                    if (stack.isEmpty()) {
-                                        val numerizedLinez = input.lines().mapIndexed { rowNumber, line -> "$rowNumber - $line" }.joinToString(separator = "\n")
-                                        throw Exception("can't find opening token '$indStartToken' for closing token '$indStopToken' at line $index column $i \n$numerizedLinez")
-                                    } else {
-                                        stack.pop()
-                                    }
-                            }
+    input.lines().forEachIndexed { index, s ->
+        var i = 0
+        while (i < s.length) {
+            when (s[i]) {
+                escapeChar -> i++
+                indStartToken[0] -> when (s.substring(i, min(s.length, i + indStartToken.length))) {
+                    indStartToken -> stack.push(Pair(index, i))
+                }
+
+                indStopToken[0] -> {
+                    when (s.substring(i, min(s.length, i + indStopToken.length))) {
+                        indStopToken -> if (stack.isEmpty()) {
+                            val numerizedLines = input.lines().mapIndexed { rowNumber, line -> "$rowNumber - $line" }
+                                .joinToString(separator = "\n")
+                            throw Exception("can't find opening token '$indStartToken' for closing token '$indStopToken' at line $index column $i \n$numerizedLines")
+                        } else {
+                            stack.pop()
                         }
                     }
-                    i++
                 }
             }
+            i++
+        }
+    }
 
     if (stack.isNotEmpty()) {
         val lastOpenedIndentation = stack.pop()
-        val numerizedLinez = input.lines().mapIndexed { index, s -> "$index - $s" }.joinToString(separator = "\n")
-        throw Exception("can't find closing token '$indStopToken' for open token '$indStartToken' at line ${lastOpenedIndentation.first} column ${lastOpenedIndentation.second} \n$numerizedLinez ")
+        val numerizedLines = input.lines().mapIndexed { index, s -> "$index - $s" }.joinToString(separator = "\n")
+        throw Exception("can't find closing token '$indStopToken' for open token '$indStartToken' at line ${lastOpenedIndentation.first} column ${lastOpenedIndentation.second} \n$numerizedLines ")
     }
 }
 
@@ -59,15 +59,17 @@ fun validateString(input: String, indStartToken: String, indStopToken: String, e
  * @param indStopToken the token used to mark the end of the new indented substring
  * @param escapeChar if the indStartToken would be escaped, it should be proceeded by this escape character
  */
-fun indentString(input: String,
-                 result: StringBuilder = StringBuilder(),
-                 initialPadding: String = "",
-                 index: AtomicInteger = AtomicInteger(0),
-                 heapDepth:Int = 0,
-                 candidateEmptyLinesIndexes : MutableList<Pair<Int,Int>> = mutableListOf(),
-                 indStartToken: String,
-                 indStopToken: String,
-                 escapeChar: Char) : StringBuilder{
+fun indentString(
+    input: String,
+    result: StringBuilder = StringBuilder(),
+    initialPadding: String = "",
+    index: AtomicInteger = AtomicInteger(0),
+    heapDepth: Int = 0,
+    candidateEmptyLinesIndexes: MutableList<Pair<Int, Int>> = mutableListOf(),
+    indStartToken: String,
+    indStopToken: String,
+    escapeChar: Char
+): StringBuilder {
 
     val padding = StringBuilder()
     while (index.get() < input.length) {
@@ -78,36 +80,52 @@ fun indentString(input: String,
                     result.append(input[nexIndex])
                 }
             }
+
             indStartToken[0] -> {
                 when (input.substring(index.get(), Math.min(input.length, index.get() + indStartToken.length))) {
                     indStartToken -> {
                         val starIndex = result.lastIndex
                         index.addAndGet(indStartToken.length)
-                        indentString(input, result, initialPadding + padding, index,heapDepth+1, candidateEmptyLinesIndexes,indStartToken, indStopToken, escapeChar)
-                        candidateEmptyLinesIndexes.add(Pair(starIndex,result.length))
+                        indentString(
+                            input,
+                            result,
+                            initialPadding + padding,
+                            index,
+                            heapDepth + 1,
+                            candidateEmptyLinesIndexes,
+                            indStartToken,
+                            indStopToken,
+                            escapeChar
+                        )
+                        candidateEmptyLinesIndexes.add(Pair(starIndex, result.length))
                     }
+
                     else -> {
                         result.append(input[index.get()])
                         padding.append(' ')
                     }
                 }
             }
+
             indStopToken[0] -> {
                 when (input.substring(index.get(), Math.min(input.length, index.get() + indStopToken.length))) {
                     indStopToken -> {
                         index.addAndGet(indStopToken.length - 1)
                         return result
                     }
+
                     else -> {
                         result.append(input[index.get()])
                         padding.append(' ')
                     }
                 }
             }
+
             '\n' -> {
                 padding.setLength(0)
                 result.append("\n$initialPadding")
             }
+
             else -> {
                 result.append(input[index.get()])
                 padding.append(' ')
@@ -116,36 +134,37 @@ fun indentString(input: String,
         index.incrementAndGet()
     }
 
-    if(heapDepth == 0 && candidateEmptyLinesIndexes.isNotEmpty()){
+    if (heapDepth == 0 && candidateEmptyLinesIndexes.isNotEmpty()) {
         //remove empty lines
         candidateEmptyLinesIndexes.reverse()
-        candidateEmptyLinesIndexes.forEach{removeIfLineIsEmpty(result,it.first,it.second)}
+        candidateEmptyLinesIndexes.forEach { removeIfLineIsEmpty(result, it.first, it.second) }
     }
     return result
 }
 
-fun removeIfLineIsEmpty(stringBuilder: StringBuilder, start:Int,end:Int){
+fun removeIfLineIsEmpty(stringBuilder: StringBuilder, start: Int, end: Int) {
 
-    if(stringBuilder.substring(start,end).isNotBlank()){
+    if (stringBuilder.substring(start, end).isNotBlank()) {
         return
     }
 
-    var lineStart=start
-    var lineEnd =end
-    while(lineStart>0 && stringBuilder[lineStart] != '\n'){
+    var lineStart = start
+    var lineEnd = end
+    while (lineStart > 0 && stringBuilder[lineStart] != '\n') {
         lineStart--
     }
-    while(lineEnd<stringBuilder.lastIndex && stringBuilder[lineEnd] != '\n'){
+    while (lineEnd < stringBuilder.lastIndex && stringBuilder[lineEnd] != '\n') {
         lineEnd++
     }
-    if(stringBuilder.substring(lineStart,lineEnd).isBlank() && stringBuilder[lineStart] == '\n'){
-        stringBuilder.replace(lineStart,lineEnd,"")
+    if (stringBuilder.substring(lineStart, lineEnd).isBlank() && stringBuilder[lineStart] == '\n') {
+        stringBuilder.replace(lineStart, lineEnd, "")
     }
 }
 
 
-
-fun generateTemplate(input: String, indStartToken: String = "<", indStopToken: String = ">", escapeChar: Char = '\\'): String {
+fun generateTemplate(
+    input: String, indStartToken: String = "<", indStopToken: String = ">", escapeChar: Char = '\\'
+): String {
 
 
     if (indStartToken[0] == indStopToken[0] || indStartToken == indStopToken) throw Exception("the indentation start and stop token should be different")
@@ -157,7 +176,8 @@ fun generateTemplate(input: String, indStartToken: String = "<", indStopToken: S
     val changedInput = input.replace(System.lineSeparator(), "\n")
 
     //Now you can indent properly
-    val result = indentString(changedInput, indStartToken = indStartToken, indStopToken = indStopToken, escapeChar = escapeChar)
+    val result =
+        indentString(changedInput, indStartToken = indStartToken, indStopToken = indStopToken, escapeChar = escapeChar)
 
     return result.toString()
 }
@@ -190,17 +210,19 @@ fun generateTemplate(input: String, indStartToken: String = "<", indStopToken: S
  * use `escapeAll` which would escape every special character in that string.
  */
 fun String.keepIndentation() = generateTemplate(this)
-fun String.keepIndentation(indStartToken: String, indStopToken: String) = generateTemplate(this, indStartToken, indStopToken)
+fun String.keepIndentation(indStartToken: String, indStopToken: String) =
+    generateTemplate(this, indStartToken, indStopToken)
 
 enum class IndentMarker(val tokens: IndentationTokens) {
-    SingleAngle(IndentationTokens("<", ">")),
-    DoubleAngle(IndentationTokens("<<", ">>")),
-    SingleCurly(IndentationTokens("{", "}")),
+    SingleAngle(IndentationTokens("<", ">")), DoubleAngle(IndentationTokens("<<", ">>")), SingleCurly(
+        IndentationTokens(
+            "{", "}"
+        )
+    ),
     DoubleCurly(IndentationTokens("{{", "}}")),
 }
 
-data class IndentationTokens(val startToken: String = "{{", val stopToken: String = "}}") {
-}
+data class IndentationTokens(val startToken: String = "{{", val stopToken: String = "}}") {}
 
 fun String.keepSingleAngleIndent(): String {
     return this keepIndentWith IndentMarker.SingleAngle
@@ -223,12 +245,12 @@ infix fun String.keepIndentWith(indentMarker: IndentMarker): String {
 }
 
 infix fun String.keepIndentWith(indentMarker: IndentationTokens): String {
-    return generateTemplate(this, indentMarker.startToken, indentMarker.stopToken).lines().map { if (it.isNotBlank()) it else "" }.joinToString("\n")
+    return generateTemplate(this, indentMarker.startToken, indentMarker.stopToken).lines()
+        .joinToString("\n") { it.ifBlank { "" } }
 }
 
 /**
  * Escape all special characters such as '<' '>' '\'
  */
-fun String.escapeAll(escapeChar: Char = '\\') = this.replace("$escapeChar", "$escapeChar$escapeChar")
-        .replace("<", "$escapeChar<")
-        .replace(">", "$escapeChar>")
+fun String.escapeAll(escapeChar: Char = '\\') =
+    this.replace("$escapeChar", "$escapeChar$escapeChar").replace("<", "$escapeChar<").replace(">", "$escapeChar>")

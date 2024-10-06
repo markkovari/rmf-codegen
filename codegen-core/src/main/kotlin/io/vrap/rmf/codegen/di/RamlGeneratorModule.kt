@@ -24,7 +24,7 @@ class RamlGeneratorModule constructor(
     override val languageBaseTypes: LanguageBaseTypes,
     override val defaultPackage: String = "io/vrap/rmf",
     override val dataSink: DataSink = FileDataSink(generatorConfig.outputFolder)
-): GeneratorModule {
+) : GeneratorModule {
 
     companion object {
         private val LOGGER = LoggerFactory.getLogger(RamlGeneratorModule::class.java)
@@ -35,9 +35,9 @@ class RamlGeneratorModule constructor(
 
     fun vrapTypeProvider(): VrapTypeProvider {
         return VrapTypeProvider(
-                PackageProvider(providePackageName(), provideModelPackageName(), provideClientPackageName()),
-                languageBaseTypes,
-                generatorConfig.customTypeMapping
+            PackageProvider(providePackageName(), provideModelPackageName(), provideClientPackageName()),
+            languageBaseTypes,
+            generatorConfig.customTypeMapping
         )
     }
 
@@ -52,7 +52,9 @@ class RamlGeneratorModule constructor(
         return generatorConfig.basePackageName ?: return try {
             URI(api.baseUri.expand()).host.split(".").reversed().joinToString("/")
         } catch (e: Exception) {
-            LOGGER.warn("Error while trying to extract base package from url, resolving to default package '$defaultPackage'",e)
+            LOGGER.warn(
+                "Error while trying to extract base package from url, resolving to default package '$defaultPackage'", e
+            )
             defaultPackage
         }
     }
@@ -60,22 +62,19 @@ class RamlGeneratorModule constructor(
     @ModelPackageName
     fun provideModelPackageName(): String {
         val basePackageName = providePackageName()
-        return generatorConfig.modelPackage
-                ?: if (basePackageName.isBlank()) "models" else "$basePackageName/models"
+        return generatorConfig.modelPackage ?: if (basePackageName.isBlank()) "models" else "$basePackageName/models"
     }
 
     @ClientPackageName
     fun provideClientPackageName(): String {
         val basePackageName = providePackageName()
-        return generatorConfig.clientPackage
-                ?: if (basePackageName.isBlank()) "client" else "$basePackageName/client"
+        return generatorConfig.clientPackage ?: if (basePackageName.isBlank()) "client" else "$basePackageName/client"
     }
 
     @SharedPackageName
     fun provideSharedPackageName(): String {
         val basePackageName = providePackageName()
-        return generatorConfig.sharedPackage
-                ?: if (basePackageName.isBlank()) "shared" else "$basePackageName/shared"
+        return generatorConfig.sharedPackage ?: if (basePackageName.isBlank()) "shared" else "$basePackageName/shared"
     }
 
     @RamlApi
@@ -91,15 +90,20 @@ class RamlGeneratorModule constructor(
     }
 
     @AllObjectTypes
-    fun allObjectTypes(): List<ObjectType> = allAnyTypes().filter { it is ObjectType && !it.deprecated() }.map { it as ObjectType }
+    fun allObjectTypes(): List<ObjectType> =
+        allAnyTypes().filter { it is ObjectType && !it.deprecated() }.map { it as ObjectType }
+
     @AllUnionTypes
-    fun allUnionTypes(): List<UnionType> = allAnyTypes().filter { it is UnionType && !it.deprecated() }.map { it as UnionType }
+    fun allUnionTypes(): List<UnionType> =
+        allAnyTypes().filter { it is UnionType && !it.deprecated() }.map { it as UnionType }
 
     @EnumStringTypes
-    fun allEnumStringTypes(): List<StringType> = allAnyTypes().filter { it is StringType && !it.deprecated() && it.enum.isNotEmpty() }.map { it as StringType }
+    fun allEnumStringTypes(): List<StringType> =
+        allAnyTypes().filter { it is StringType && !it.deprecated() && it.enum.isNotEmpty() }.map { it as StringType }
 
     @PatternStringTypes
-    fun allPatternStringTypes(): List<StringType> = allAnyTypes().filter { it is StringType && !it.deprecated() && it.pattern != null }.map { it as StringType }
+    fun allPatternStringTypes(): List<StringType> =
+        allAnyTypes().filter { it is StringType && !it.deprecated() && it.pattern != null }.map { it as StringType }
 
     @NamedScalarTypes
     fun allNamedScalarTypes(): List<StringType> = allAnyTypes().filter {
@@ -125,10 +129,9 @@ class RamlGeneratorModule constructor(
     fun resourceCollection(vrapTypeProvider: VrapTypeProvider): List<ResourceCollection> {
         val resources = allResources()
         return resources.groupBy { (vrapTypeProvider.doSwitch(it) as VrapObjectType).simpleClassName }
-                .map { entry: Map.Entry<String, List<Resource>> ->
-                    ResourceCollection(vrapTypeProvider.doSwitch(entry.value[0]), entry.value)
-                }
-                .toList()
+            .map { entry: Map.Entry<String, List<Resource>> ->
+                ResourceCollection(vrapTypeProvider.doSwitch(entry.value[0]), entry.value)
+            }.toList()
     }
 
 
@@ -142,15 +145,15 @@ class RamlGeneratorModule constructor(
         }
 
         private inner class FilterTypeSwitch : TypesSwitch<Boolean>() {
-            override fun caseNamedElement(`object`: NamedElement): Boolean = generatorConfig.customTypeMapping[`object`.name]?.let { false }
-                    ?: true
+            override fun caseNamedElement(`object`: NamedElement): Boolean =
+                generatorConfig.customTypeMapping[`object`.name]?.let { false } ?: true
 
             override fun caseStringType(stringType: StringType): Boolean = true
-            override fun defaultCase(`object`: EObject?): Boolean? = false
+            override fun defaultCase(`object`: EObject?): Boolean = false
         }
     }
 
-    private fun AnyType.deprecated() : Boolean {
+    private fun AnyType.deprecated(): Boolean {
         val anno = this.getAnnotation("deprecated")
         return (anno != null && (anno.value as BooleanInstance).value)
     }

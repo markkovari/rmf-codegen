@@ -5,9 +5,10 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.util.ComposedSwitch
 import org.slf4j.LoggerFactory
 
-class VrapTypeProvider constructor(packageProvider: PackageProvider,
-                                           val languageBaseTypes: LanguageBaseTypes,
-                                           val customTypeMapping: Map<String, VrapType>
+class VrapTypeProvider constructor(
+    packageProvider: PackageProvider,
+    val languageBaseTypes: LanguageBaseTypes,
+    val customTypeMapping: Map<String, VrapType>
 ) : ComposedSwitch<VrapType>() {
 
 

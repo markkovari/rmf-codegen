@@ -22,26 +22,26 @@ class CoreCodeGenerator constructor(val dataSink: DataSink, val gitHash: String,
             }
         }
 
-        val templateFiles :MutableList<Publisher<TemplateFile>> = mutableListOf()
+        val templateFiles: MutableList<Publisher<TemplateFile>> = mutableListOf()
 
         if (gitHash.isNotBlank()) {
-            templateFiles.add(Flowable.just(TemplateFile(relativePath = "gen.properties", content = """
+            templateFiles.add(
+                Flowable.just(
+                    TemplateFile(
+                        relativePath = "gen.properties", content = """
                 hash=${gitHash}
-            """.trimIndent())))
+            """.trimIndent()
+                    )
+                )
+            )
         }
 
         templateFiles.addAll(generators.flatMap { generator -> generator.generate() })
 
         if (!dataSink.dryRun()) {
-            Flowable.concat(templateFiles)
-                .observeOn(Schedulers.io())
-                .parallel(PARALLELISM)
-                .map { dataSink.write(it) }
+            Flowable.concat(templateFiles).observeOn(Schedulers.io()).parallel(PARALLELISM).map { dataSink.write(it) }
                 .sequential()
-                .blockingSubscribe(
-                        {},
-                        { error -> LOGGER.error("Error occured while generating files",error)}
-                )
+                .blockingSubscribe({}, { error -> LOGGER.error("Error occured while generating files", error) })
 
             dataSink.postClean()
         }

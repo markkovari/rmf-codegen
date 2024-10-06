@@ -18,8 +18,8 @@ class OasGeneratorModule constructor(
     override val generatorConfig: io.vrap.rmf.codegen.CodeGeneratorConfig,
     override val languageBaseTypes: LanguageBaseTypes,
     override val defaultPackage: String = "io/vrap/rmf",
-    override val dataSink: DataSink =  FileDataSink(generatorConfig.outputFolder)
-): GeneratorModule {
+    override val dataSink: DataSink = FileDataSink(generatorConfig.outputFolder)
+) : GeneratorModule {
 
     companion object {
         private val LOGGER = LoggerFactory.getLogger(OasGeneratorModule::class.java)
@@ -35,19 +35,16 @@ class OasGeneratorModule constructor(
     }
 
     @AllObjectSchemaTypes
-    fun allObjectTypes(): List<Map.Entry<String, ObjectSchema>> = allAnyTypes()
-        .filter { it.value is ObjectSchema }
-        .map { SimpleEntry(it.key, it.value as ObjectSchema) }
+    fun allObjectTypes(): List<Map.Entry<String, ObjectSchema>> =
+        allAnyTypes().filter { it.value is ObjectSchema }.map { SimpleEntry(it.key, it.value as ObjectSchema) }
 
     @AllStringSchemaTypes
-    fun allStringTypes(): List<Map.Entry<String, StringSchema>> = allAnyTypes()
-        .filter { it.value is StringSchema }
-        .map { SimpleEntry(it.key, it.value as StringSchema) }
+    fun allStringTypes(): List<Map.Entry<String, StringSchema>> =
+        allAnyTypes().filter { it.value is StringSchema }.map { SimpleEntry(it.key, it.value as StringSchema) }
 
     @AllComposedSchemaTypes
-    fun allComposedTypes(): List<Map.Entry<String, ComposedSchema>> = allAnyTypes()
-        .filter { it.value is ComposedSchema }
-        .map { SimpleEntry(it.key, it.value as ComposedSchema) }
+    fun allComposedTypes(): List<Map.Entry<String, ComposedSchema>> =
+        allAnyTypes().filter { it.value is ComposedSchema }.map { SimpleEntry(it.key, it.value as ComposedSchema) }
 
     @AllPathItems
     fun allPathItems(): List<Map.Entry<String, PathItem>> = provideOasModel().paths.entries.toList()
@@ -60,16 +57,17 @@ class OasGeneratorModule constructor(
             return defaultPackage
         }
         return generatorConfig.basePackageName ?: return try {
-            URI(api.servers.get(0).url).host.split(".").reversed().joinToString("/")
+            URI(api.servers.first().url).host.split(".").reversed().joinToString("/")
         } catch (e: Exception) {
-            LOGGER.warn("Error while trying to extract base package from url, resolving to default package '$defaultPackage'",e)
+            LOGGER.warn(
+                "Error while trying to extract base package from url, resolving to default package '$defaultPackage'", e
+            )
             defaultPackage
         }
     }
 
     fun provideModelPackageName(): String {
         val basePackageName = providePackageName()
-        return generatorConfig.modelPackage
-            ?: if (basePackageName.isBlank()) "models" else "$basePackageName/models"
+        return generatorConfig.modelPackage ?: if (basePackageName.isBlank()) "models" else "$basePackageName/models"
     }
 }

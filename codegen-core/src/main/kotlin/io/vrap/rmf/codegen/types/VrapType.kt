@@ -2,7 +2,7 @@ package io.vrap.rmf.codegen.types
 
 sealed class VrapType
 
-open class VrapObjectType(val `package` :String, val simpleClassName:String) : VrapType() {
+open class VrapObjectType(val `package`: String, val simpleClassName: String) : VrapType() {
 
 
     override fun toString(): String {
@@ -29,12 +29,11 @@ open class VrapObjectType(val `package` :String, val simpleClassName:String) : V
 }
 
 enum class DateTimeTypes(val format: String) {
-    DateTime("date-time"),
-    DateOnly("date"),
-    TimeOnly("time")
+    DateTime("date-time"), DateOnly("date"), TimeOnly("time")
 }
 
-class VrapDateTimeType(`package` :String, simpleClassName:String, val dateTimeType: DateTimeTypes): VrapObjectType(`package`,simpleClassName) {
+class VrapDateTimeType(`package`: String, simpleClassName: String, val dateTimeType: DateTimeTypes) :
+    VrapObjectType(`package`, simpleClassName) {
 
     override fun toString(): String {
         return "VrapDateTimeType(format='${dateTimeType.format}')"
@@ -59,9 +58,9 @@ class VrapDateTimeType(`package` :String, simpleClassName:String, val dateTimeTy
     }
 }
 
-class VrapLibraryType( `package` :String, simpleClassName:String) : VrapObjectType(`package`,simpleClassName)
+class VrapLibraryType(`package`: String, simpleClassName: String) : VrapObjectType(`package`, simpleClassName)
 
-class VrapEnumType(val `package` :String, val simpleClassName:String) : VrapType() {
+class VrapEnumType(val `package`: String, val simpleClassName: String) : VrapType() {
 
 
     override fun toString(): String {
@@ -90,9 +89,9 @@ class VrapEnumType(val `package` :String, val simpleClassName:String) : VrapType
 /**
  * Represent a type that comes from the default package
  */
-class VrapScalarType constructor(val scalarType:String, val primitiveType:String) : VrapType() {
+class VrapScalarType constructor(val scalarType: String, val primitiveType: String) : VrapType() {
 
-    constructor(scalarType: String): this(scalarType, scalarType)
+    constructor(scalarType: String) : this(scalarType, scalarType)
 
     override fun toString(): String {
         return "VrapScalarType(scalarType='$scalarType')"
@@ -110,14 +109,11 @@ class VrapScalarType constructor(val scalarType:String, val primitiveType:String
         return true
     }
 
-    override fun hashCode(): Int {
-        var result = scalarType.hashCode()
-        result = 31 * result + primitiveType.hashCode()
-        return result
-    }
+    override fun hashCode(): Int = 31 * scalarType.hashCode() + primitiveType.hashCode()
+
 }
 
-class VrapArrayType(val itemType: VrapType) : VrapType(){
+class VrapArrayType(val itemType: VrapType) : VrapType() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -134,7 +130,7 @@ class VrapArrayType(val itemType: VrapType) : VrapType(){
     }
 }
 
-class VrapNilType : VrapType(){
+class VrapNilType : VrapType() {
 
     val name = "void"
 
@@ -153,7 +149,7 @@ class VrapNilType : VrapType(){
 /**
  * Represent a type that comes from the default package
  */
-class VrapAnyType(val baseType:String) : VrapType() {
+class VrapAnyType(val baseType: String) : VrapType() {
 
 
     override fun toString(): String {
@@ -166,9 +162,7 @@ class VrapAnyType(val baseType:String) : VrapType() {
 
         other as VrapAnyType
 
-        if (baseType != other.baseType) return false
-
-        return true
+        return baseType == other.baseType
     }
 
     override fun hashCode(): Int {

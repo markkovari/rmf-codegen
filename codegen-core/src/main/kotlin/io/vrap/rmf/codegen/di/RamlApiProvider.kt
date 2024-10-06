@@ -10,13 +10,14 @@ import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.nio.file.Path
 
-class RamlApiProvider constructor(private val ramlFileLocation: Path): ApiProvider {
+class RamlApiProvider constructor(private val ramlFileLocation: Path) : ApiProvider {
 
-    private val logger : Logger = LoggerFactory.getLogger(RamlApiProvider::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(RamlApiProvider::class.java)
 
     override val gitHash: String by lazy {
         try {
-            Runtime.getRuntime().exec("git -C ${ramlFileLocation.parent} rev-parse HEAD").inputStream.bufferedReader().readLine().orEmpty()
+            Runtime.getRuntime().exec("git -C ${ramlFileLocation.parent} rev-parse HEAD").inputStream.bufferedReader()
+                .readLine().orEmpty()
         } catch (e: IOException) {
             logger.info("Couldn't retrieve git hash for {}", ramlFileLocation.parent, e)
             ""
@@ -30,7 +31,7 @@ class RamlApiProvider constructor(private val ramlFileLocation: Path): ApiProvid
         }
         logger.info("Parsing API took ${duration.toSeconds(3)}s")
         val validationResults = modelResult.validationResults
-        if (!validationResults.isEmpty()) {
+        if (validationResults.isNotEmpty()) {
             logger.warn("Error(s) found validating ${fileURI.toFileString()}:")
             validationResults.stream().forEach { logger.warn(it.toString()) }
             throw RuntimeException("Error while parsing file ${fileURI.toFileString()}")

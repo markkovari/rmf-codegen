@@ -3,41 +3,43 @@ package io.vrap.rmf.codegen.types
 import io.vrap.rmf.raml.model.types.*
 import io.vrap.rmf.raml.model.types.util.TypesSwitch
 
-class AnyTypeProvider constructor(val packageProvider: PackageProvider, val languageBaseTypes: LanguageBaseTypes) : TypesSwitch<VrapType>() {
+class AnyTypeProvider constructor(val packageProvider: PackageProvider, val languageBaseTypes: LanguageBaseTypes) :
+    TypesSwitch<VrapType>() {
 
     override fun caseUnionType(unionType: UnionType): VrapType {
         val oneOfWithoutNilType = unionType.oneOf
-                .filter { t -> t !is NilType }
-                .toList()
+            .filter { t -> t !is NilType }
+            .toList()
         return if (oneOfWithoutNilType.size == 1) {
             doSwitch(oneOfWithoutNilType[0])
         } else {
-            if( unionType.name !=null){
+            if (unionType.name != null) {
                 VrapObjectType(`package` = packageProvider.doSwitch(unionType), simpleClassName = unionType.name)
-            }
-            else
+            } else
                 languageBaseTypes.objectType
         }
     }
 
     override fun caseAnyType(`object`: AnyType) = languageBaseTypes.anyType
 
-    override fun caseNumberType(type: NumberType) : VrapType {
+    override fun caseNumberType(type: NumberType): VrapType {
         return when (type.format) {
             NumberFormat.INT,
             NumberFormat.INT8,
             NumberFormat.INT16,
             NumberFormat.INT32 -> languageBaseTypes.integerType
+
             NumberFormat.LONG,
-            NumberFormat.INT64 ->  languageBaseTypes.longType
+            NumberFormat.INT64 -> languageBaseTypes.longType
+
             else -> languageBaseTypes.doubleType
         }
     }
 
-    override fun caseIntegerType(type : IntegerType) : VrapType {
+    override fun caseIntegerType(type: IntegerType): VrapType {
         return when (type.format) {
-            NumberFormat.LONG ->  languageBaseTypes.longType
-            NumberFormat.INT64 ->  languageBaseTypes.longType
+            NumberFormat.LONG -> languageBaseTypes.longType
+            NumberFormat.INT64 -> languageBaseTypes.longType
             else -> languageBaseTypes.integerType
         }
     }
@@ -50,10 +52,11 @@ class AnyTypeProvider constructor(val packageProvider: PackageProvider, val lang
 
     override fun caseDateOnlyType(`object`: DateOnlyType) = languageBaseTypes.dateOnlyType
 
-    override fun caseArrayType(arrayType: ArrayType) = VrapArrayType(arrayType.items?.let {doSwitch(arrayType.items) } ?: languageBaseTypes.objectType)
+    override fun caseArrayType(arrayType: ArrayType) =
+        VrapArrayType(arrayType.items?.let { doSwitch(arrayType.items) } ?: languageBaseTypes.objectType)
 
-    override fun caseObjectType(objectType: ObjectType) : VrapType {
-        if(objectType.name == "object"){
+    override fun caseObjectType(objectType: ObjectType): VrapType {
+        if (objectType.name == "object") {
             return languageBaseTypes.objectType;
         }
         return VrapObjectType(`package` = packageProvider.doSwitch(objectType), simpleClassName = objectType.name)

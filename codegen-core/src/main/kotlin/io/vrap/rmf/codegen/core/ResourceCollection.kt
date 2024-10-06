@@ -6,7 +6,7 @@ import io.vrap.rmf.raml.model.resources.Resource
 class ResourceCollection(val className: VrapType, val resources: List<Resource>) {
 
     val sample: Resource
-        get() = resources[0]
+        get() = resources.first()
 
     init {
         if (resources.isEmpty()) {

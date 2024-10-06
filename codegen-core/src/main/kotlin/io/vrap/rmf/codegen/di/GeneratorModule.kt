@@ -1,7 +1,6 @@
 package io.vrap.rmf.codegen.di
 
 import io.vrap.rmf.codegen.io.DataSink
-import io.vrap.rmf.codegen.io.FileDataSink
 import io.vrap.rmf.codegen.types.LanguageBaseTypes
 import io.vrap.rmf.codegen.types.VrapType
 import java.nio.file.Path
@@ -18,7 +17,7 @@ interface GeneratorModule {
     fun defaultPackage(): String = defaultPackage
 
     @OutputFolder
-    fun outpuFolder(): Path = generatorConfig.outputFolder
+    fun outputFolder(): Path = generatorConfig.outputFolder
 
     @GenDataSink
     fun dataSink(): DataSink = dataSink
