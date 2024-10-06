@@ -44,7 +44,8 @@ class GoFileProducer constructor(
                 "    \"$it\""
             }
 
-        val importExpr = if (modules.size > 0) modules.joinToString(prefix = "import(\n", separator = "\n", postfix = "\n)") else ""
+        val importExpr =
+            if (modules.size > 0) modules.joinToString(prefix = "import(\n", separator = "\n", postfix = "\n)") else ""
 
         val content = """
            |package $basePackageName
@@ -189,7 +190,9 @@ class GoFileProducer constructor(
                 && allProperties.any { it.isPatternProperty() }
             ) {
                 this.renderDecodeFunc()
-            } else { "" }
+            } else {
+                ""
+            }
 
             return """
             |$structField
@@ -330,6 +333,7 @@ class GoFileProducer constructor(
                     is ArrayType -> {
                         type.items.isDiscriminated()
                     }
+
                     is ObjectType -> type.isDiscriminated()
                     else -> false
                 }
@@ -350,6 +354,7 @@ class GoFileProducer constructor(
                         |}
                         """.trimMargin()
                     }
+
                     is ObjectType -> {
                         val typeName = type.name.exportName()
                         """
@@ -362,6 +367,7 @@ class GoFileProducer constructor(
                         |}
                         """.trimMargin()
                     }
+
                     else -> ""
                 }
             }
@@ -369,7 +375,7 @@ class GoFileProducer constructor(
     }
 
     fun ObjectType.renderUnmarshalFuncPatternHandlers(): String {
-        val deleteFields = allProperties.filter {it.isPatternProperty() } .flatMap {
+        val deleteFields = allProperties.filter { it.isPatternProperty() }.flatMap {
             val name = it.patternName()
             allProperties.filter { !it.isPatternProperty() }.map {
                 """delete(obj.${name}, "${it.name}")"""
@@ -408,8 +414,8 @@ class GoFileProducer constructor(
     }
 
     fun ObjectType.renderDecodeFunc(): String {
-        val statements = allProperties.filter { it.isPatternProperty() } .map {
-            val patternStmt = if (it.name == "//") "// ${it.pattern }" else """
+        val statements = allProperties.filter { it.isPatternProperty() }.map {
+            val patternStmt = if (it.name == "//") "// ${it.pattern}" else """
                 |match, err := regexp.MatchString("${it.pattern}", key)
                 |if (err != nil) {
                 |    panic(err)
@@ -536,9 +542,11 @@ class GoFileProducer constructor(
                 |<${this.renderEnumValues(vrapType.simpleClassName)}>
                 |
                 """.trimMargin()
+
             is VrapScalarType -> """
                 |type ${this.name} = ${vrapType.scalarType}
             """.trimMargin()
+
             else -> ""
         }
     }
