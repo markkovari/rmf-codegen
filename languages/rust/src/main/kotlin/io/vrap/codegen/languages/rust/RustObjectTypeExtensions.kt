@@ -52,7 +52,7 @@ interface RustObjectTypeExtensions : ExtensionsBase {
     private fun ObjectType.getTypeDependencies(): List<VrapType> {
         return this.allProperties.map { it.type }
             .flatMap { if (it is UnionType) it.oneOf else Collections.singletonList(it) }.filterNotNull()
-            .map { it.toVrapType() }.map { it.flattenVrapType() }.filterNotNull().filter { it !is VrapScalarType }
+            .map { it.toVrapType() }.map { it.flattenVrapType() }.filter { it !is VrapScalarType }
     }
 
     fun EObject?.toVrapType(): VrapType {
@@ -80,35 +80,35 @@ interface RustObjectTypeExtensions : ExtensionsBase {
 
     fun List<AnyType>.getEnumVrapTypes(): List<VrapType> {
         return this.filterIsInstance<ObjectType>().flatMap { it.allProperties }.map { it.type.toVrapType() }.map {
-                when (it) {
+            when (it) {
+                is VrapEnumType -> it
+                is VrapArrayType -> when (it.itemType) {
                     is VrapEnumType -> it
-                    is VrapArrayType -> when (it.itemType) {
-                        is VrapEnumType -> it
-                        else -> null
-                    }
-
                     else -> null
                 }
-            }.filterNotNull()
+
+                else -> null
+            }
+        }.filterNotNull()
     }
 
     fun List<VrapType>.getImportsForModelVrapTypes(moduleName: String): List<String> {
         return this.map { it.flattenVrapType() }.distinct().filter {
-                when (it) {
-                    is VrapObjectType -> it.`package` != moduleName
-                    is VrapEnumType -> it.`package` != moduleName
-                    else -> false
-                }
-            }.groupBy {
-                when (it) {
-                    is VrapObjectType -> it.`package`
-                    is VrapEnumType -> it.`package`
-                    else -> throw IllegalStateException("this case should have been filtered")
-                }
-            }.toSortedMap().map {
-                val allImportedClasses = it.value.map { it.simpleRustName() }.sorted().joinToString(", ")
-                "from ${it.key.toRelativePackageName(moduleName)} import $allImportedClasses"
+            when (it) {
+                is VrapObjectType -> it.`package` != moduleName
+                is VrapEnumType -> it.`package` != moduleName
+                else -> false
             }
+        }.groupBy {
+            when (it) {
+                is VrapObjectType -> it.`package`
+                is VrapEnumType -> it.`package`
+                else -> throw IllegalStateException("this case should have been filtered")
+            }
+        }.toSortedMap().map {
+            val allImportedClasses = it.value.map { it.simpleRustName() }.sorted().joinToString(", ")
+            "from ${it.key.toRelativePackageName(moduleName)} import $allImportedClasses"
+        }
     }
 
     fun List<AnyType>.getTypeInheritance(type: AnyType): List<AnyType> {
@@ -160,8 +160,8 @@ interface RustObjectTypeExtensions : ExtensionsBase {
         }
 
         return rustStructFields(true).any {
-                it.type is StringType && it.name.lowercase() == "message"
-            }
+            it.type is StringType && it.name.lowercase() == "message"
+        }
     }
 
     fun ObjectType.isMap(): Boolean {

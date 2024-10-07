@@ -8,24 +8,24 @@ fun ResourceContainer.subResources(structName: String): String {
     val pName = if (structName == "Client") "c" else "rb"
 
     return this.resources.map {
-            var args = if (!it.relativeUri.variables.isNullOrEmpty()) {
-                it.relativeUri.variables
+        var args = if (!it.relativeUri.variables.isNullOrEmpty()) {
+            it.relativeUri.variables
 //                    .map { it.goName() }
-                    .map { "$it string" }.joinToString(separator = ", ")
-            } else {
-                ""
-            }
+                .map { "$it string" }.joinToString(separator = ", ")
+        } else {
+            ""
+        }
 
-            val assignments = it.relativeUri.variables
+        val assignments = it.relativeUri.variables
 //                    .map { it.goName() }
-                .map { "$it: $it," }.plus((it.fullUri.variables.asList() - it.relativeUri.variables.asList())
+            .map { "$it: $it," }.plus((it.fullUri.variables.asList() - it.relativeUri.variables.asList())
 //                            .map { it.goName() }
-                    .map { "$it: $pName.$it," }).joinToString(separator = "\n")
-            """
+                .map { "$it: $pName.$it," }).joinToString(separator = "\n")
+        """
             |fn ($pName *$structName) ${it.getMethodName()}($args) *${it} {
             |
             |
             |}
              """.trimMargin()
-        }.joinToString(separator = "\n")
+    }.joinToString(separator = "\n")
 }

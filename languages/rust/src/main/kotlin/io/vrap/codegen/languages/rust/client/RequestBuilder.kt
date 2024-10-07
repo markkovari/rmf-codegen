@@ -25,7 +25,7 @@ class RequestBuilder constructor(
 
         val filename = type.rustClientFileName()
         return TemplateFile(
-            relativePath = "$basePackageName/$filename.go", content = """|
+            relativePath = "src/client/$basePackageName/$filename.rs", content = """|
                 |package $basePackageName
                 |
                 |$rustGeneratedComment
