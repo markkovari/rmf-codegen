@@ -23,13 +23,11 @@ object RustClientModule : Module {
             ), generatorModule.allResources()
         ), MethodGenerator(
             setOf(
-//                GoMethodRenderer(
-//                    generatorModule.vrapTypeProvider(), generatorModule.providePackageName()
-//                )
-            ),
-            generatorModule.allResourceMethods()
-        ),
-        FileGenerator(
+                RustMethodRenderer(
+                    generatorModule.vrapTypeProvider(), generatorModule.providePackageName()
+                )
+            ), generatorModule.allResourceMethods()
+        ), FileGenerator(
             setOf(
                 ClientFileProducer(
                     generatorModule.provideRamlModel(), generatorModule.providePackageName()

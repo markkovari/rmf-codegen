@@ -21,17 +21,15 @@ import io.vrap.rmf.raml.model.resources.Method
 import io.vrap.rmf.raml.model.types.ArrayType
 import io.vrap.rmf.raml.model.types.FileType
 
-class GoMethodRenderer(
+class RustMethodRenderer(
     override val vrapTypeProvider: VrapTypeProvider, @BasePackageName val basePackageName: String
 ) : MethodRenderer, RustObjectTypeExtensions {
 
     override fun render(type: Method): TemplateFile {
 
-        val filename = type.rustClientFileName()
+        val filename = type.rustClientModuleName()
         return TemplateFile(
-            relativePath = "$basePackageName/$filename.go", content = """|
-                |package $basePackageName
-                |
+            relativePath = "src/$basePackageName/client/$filename.rs", content = """|
                 |$rustGeneratedComment
                 |
                 |<${type.importStatement()}>

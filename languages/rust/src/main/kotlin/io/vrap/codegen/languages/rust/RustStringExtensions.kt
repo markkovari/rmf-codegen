@@ -11,7 +11,7 @@ fun String.toRelativePackageName(base: String): String {
         if (i < partsTo.size) {
             if (partsFrom.slice(0..i).joinToString(".") == partsTo.slice(0..i).joinToString(".")) {
                 if (path == "") path = "."
-                return path + partsTo.slice(i + 1..partsTo.size - 1).joinToString(separator = ".")
+                return path + partsTo.slice(i + 1 until partsTo.size).joinToString(separator = ".")
             }
         }
         path += "."
@@ -20,24 +20,18 @@ fun String.toRelativePackageName(base: String): String {
 }
 
 fun String.rustModelFileName(): String {
-    return this.split("/")
-        .map { StringCaseFormat.LOWER_UNDERSCORE_CASE.apply(it) }
-        .joinToString(separator = "/")
-        .replace("models/", "types_")
+    return this.split("/").joinToString(separator = "/") { StringCaseFormat.LOWER_UNDERSCORE_CASE.apply(it) }
         .replace("_+".toRegex(), "_")
 }
 
 fun String.rustClientFileName(): String {
-    return this.split("/")
-        .map { StringCaseFormat.LOWER_UNDERSCORE_CASE.apply(it) }
-        .joinToString(separator = "/")
-        .replace("client/", "client_")
-        .replace("_+".toRegex(), "_")
+    return this.split("/").joinToString(separator = "/") { StringCaseFormat.LOWER_UNDERSCORE_CASE.apply(it) }
+        .replace("client/", "client_").replace("_+".toRegex(), "_")
 }
 
 fun String.exportName(): String {
     if (this.contains("/")) {
-        throw Exception("Invalid identifier name: " + this)
+        throw Exception("Invalid identifier name: $this")
     }
     if (this[0].isUpperCase()) {
         return this
